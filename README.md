@@ -13,11 +13,11 @@ This project is built with Python 3.7.1, matplolib 2.2.3 and numpy 1.15.4.
 
 Tested on Windows 7.
 
-**The full documentation is in 'build/html/index.html'**
+**The full documentation is in 'docs/build/html/index.html'**
 
 The following is an example of plotting two curly brackets to annotate a sine wave.
 
-![Example](build/html/_sources/img/exp.jpg)
+![Example](docs/build/html/_sources/img/exp.jpg)
 
 ## Main features
 
@@ -43,14 +43,14 @@ The following is an example of plotting two curly brackets to annotate a sine wa
 
 ### Annotating sine waves
 
-<!-- ![Example](build/html/_sources/img/exp_sin.png =250x200) -->
-<img src="build/html/_sources/img/exp_sin.png" alt="exp_sin" width="400"/>
+<!-- ![Example](docs/build/html/_sources/img/exp_sin.png =250x200) -->
+<img src="docs/build/html/_sources/img/exp_sin.png" alt="exp_sin" width="400"/>
 
 
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from curlyBrace import curlyBrace
+from curlybrace import curlybrace
 import os
 
 # save fig control
@@ -123,16 +123,16 @@ k_r1 = 0.05
 k_r2 = 0.1
 
 # clockwise, need to swap the start point and end point
-curlyBrace(fig, axes[0], p2, p1, k_r1, bool_auto=True, str_text=str_text, color='r', lw=2, int_line_num=1, fontdict=font)
+curlybrace(fig, axes[0], p2, p1, k_r1, bool_auto=True, str_text=str_text, color='r', lw=2, int_line_num=1, fontdict=font)
 
 # anti-clockwise, no need to swap the start point and end point
-curlyBrace(fig, axes[0], p3, p4, k_r2, bool_auto=True, str_text=str_text, color='darkorange', lw=3, int_line_num=1, fontdict=font)
+curlybrace(fig, axes[0], p3, p4, k_r2, bool_auto=True, str_text=str_text, color='darkorange', lw=3, int_line_num=1, fontdict=font)
 
 # clockwise, need to swap the start point and end point
-curlyBrace(fig, axes[1], p2, p1, k_r1, bool_auto=False, str_text=str_text, color='m', lw=2, int_line_num=1, fontdict=font)
+curlybrace(fig, axes[1], p2, p1, k_r1, bool_auto=False, str_text=str_text, color='m', lw=2, int_line_num=1, fontdict=font)
 
 # anti-clockwise, no need to swap the start point and end point
-curlyBrace(fig, axes[1], p3, p4, k_r2, bool_auto=False, str_text=str_text, color='darkgreen', lw=3, int_line_num=1, fontdict=font)
+curlybrace(fig, axes[1], p3, p4, k_r2, bool_auto=False, str_text=str_text, color='darkgreen', lw=3, int_line_num=1, fontdict=font)
 
 # save fig
 if bool_savefig:
@@ -153,27 +153,27 @@ plt.show()
 
 ### Annotating circles
 
-<!-- ![Example](build/html/_sources/img/exp_circle.png) -->
+<!-- ![Example](docs/build/html/_sources/img/exp_circle.png) -->
 
-<img src="build/html/_sources/img/exp_circle.png" alt="exp_circle" width="400"/>
+<img src="docs/build/html/_sources/img/exp_circle.png" alt="exp_circle" width="400"/>
 
 ### Annotating log scale
 
-<!-- ![Example](build/html/_sources/img/exp_log.png) -->
+<!-- ![Example](docs/build/html/_sources/img/exp_log.png) -->
 
-<img src="build/html/_sources/img/exp_log.png" alt="exp_log" width="400"/>
+<img src="docs/build/html/_sources/img/exp_log.png" alt="exp_log" width="400"/>
 
 ### Annotating ellipses
 
-<!-- ![Example](build/html/_sources/img/exp_ellipse.png) -->
+<!-- ![Example](docs/build/html/_sources/img/exp_ellipse.png) -->
 
-<img src="build/html/_sources/img/exp_ellipse.png" alt="exp_ellipse" width="400"/>
+<img src="docs/build/html/_sources/img/exp_ellipse.png" alt="exp_ellipse" width="400"/>
 
 ### Annotating astroids
 
-<!-- ![Example](build/html/_sources/img/exp_astroid.png) -->
+<!-- ![Example](docs/build/html/_sources/img/exp_astroid.png) -->
 
-<img src="build/html/_sources/img/exp_astroid.png" alt="exp_astroid" width="400"/>
+<img src="docs/build/html/_sources/img/exp_astroid.png" alt="exp_astroid" width="400"/>
 
 ## Contributing
 

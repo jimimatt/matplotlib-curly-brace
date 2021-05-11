@@ -1,4 +1,12 @@
-# Plot curly brace with matplotlib
+## Fork of curlyBrace
+
+Thank you to Dr. Siyu Gao for his great work on this library. My fork just reorganizes the code and adds a `setup.py` file so you can install via pip:
+
+```
+pip install git+https://github.com/jhultman/matplotlib-curly-brace
+```
+
+## Plot curly brace with matplotlib
 
 **The full documentation is [here](https://matplotlib-curly-brace.readthedocs.io/en/latest/).**
 
@@ -21,23 +29,23 @@ The following is an example of plotting two curly brackets to annotate a sine wa
 
 ## Main features
 
-* **Allows intuitive plotting of a curly bracket between two points within the given axes of the given figure** 
-* **Allows text annotation to be placed at the summit of the bracket with the same rotation as the bracket**
-* **The height of the bracket can be controlled**
-* **Accepts line settings for the bracket lines (same as matplotlib via named parameters, e.g., line width, line colour, etc.)**
-* **Accepts font settings of the annotating text (same as matplotlib, just give a fontdict)**
-* **Works with linear axes and log axes**
-* **Transformation between axes coordinates and screen coordinates can be turned on or off**
+- Allows intuitive plotting of a curly bracket between two points within the given axes of the given figure 
+- Allows text annotation to be placed at the summit of the bracket with the same rotation as the bracket
+- The height of the bracket can be controlled
+- Accepts line settings for the bracket lines (same as matplotlib via named parameters, e.g., line width, line colour, etc.)
+- Accepts font settings of the annotating text (same as matplotlib, just give a fontdict)
+- Works with linear axes and log axes
+- Transformation between axes coordinates and screen coordinates can be turned on or off
 
 ## Prerequisites
 
-* **Python 3.5+**
-* **maplotlib**
-* **numpy**
+- Python 3.5+
+- matplotlib
+- numpy
 
 ## Version
 
-**1.0.1**
+1.0.1
 
 ## Example
 
@@ -50,7 +58,7 @@ The following is an example of plotting two curly brackets to annotate a sine wa
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
-from curlybrace import curlybrace
+from curlyBrace import curlyBrace
 import os
 
 # save fig control
@@ -123,16 +131,16 @@ k_r1 = 0.05
 k_r2 = 0.1
 
 # clockwise, need to swap the start point and end point
-curlybrace(fig, axes[0], p2, p1, k_r1, bool_auto=True, str_text=str_text, color='r', lw=2, int_line_num=1, fontdict=font)
+curlyBrace(fig, axes[0], p2, p1, k_r1, bool_auto=True, str_text=str_text, color='r', lw=2, int_line_num=1, fontdict=font)
 
 # anti-clockwise, no need to swap the start point and end point
-curlybrace(fig, axes[0], p3, p4, k_r2, bool_auto=True, str_text=str_text, color='darkorange', lw=3, int_line_num=1, fontdict=font)
+curlyBrace(fig, axes[0], p3, p4, k_r2, bool_auto=True, str_text=str_text, color='darkorange', lw=3, int_line_num=1, fontdict=font)
 
 # clockwise, need to swap the start point and end point
-curlybrace(fig, axes[1], p2, p1, k_r1, bool_auto=False, str_text=str_text, color='m', lw=2, int_line_num=1, fontdict=font)
+curlyBrace(fig, axes[1], p2, p1, k_r1, bool_auto=False, str_text=str_text, color='m', lw=2, int_line_num=1, fontdict=font)
 
 # anti-clockwise, no need to swap the start point and end point
-curlybrace(fig, axes[1], p3, p4, k_r2, bool_auto=False, str_text=str_text, color='darkgreen', lw=3, int_line_num=1, fontdict=font)
+curlyBrace(fig, axes[1], p3, p4, k_r2, bool_auto=False, str_text=str_text, color='darkgreen', lw=3, int_line_num=1, fontdict=font)
 
 # save fig
 if bool_savefig:

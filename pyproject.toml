@@ -1,0 +1,15 @@
+[project]
+name = "matplotlib-curly-brace"
+version = "v1.1.0"
+description = "matplotlib curly brace support"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "高斯羽 博士 (Dr. Gao, Siyu)" }
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+    "matplotlib>=3.5",
+    "numpy>=1.26",
+]

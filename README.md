@@ -1,12 +1,4 @@
-## Fork of curlyBrace
-
-Thank you to Dr. Siyu Gao for his great work on this library. My fork just reorganizes the code and adds a `setup.py` file so you can install via pip:
-
-```
-pip install git+https://github.com/jhultman/matplotlib-curly-brace
-```
-
-## Plot curly brace with matplotlib
+# Plot curly brace with matplotlib
 
 **The full documentation is [here](https://matplotlib-curly-brace.readthedocs.io/en/latest/).**
 
@@ -17,10 +9,6 @@ the axes and plot a curly bracket with text annotation at the summit of the brac
 
 The implementation here is based largely on the implementation by [Pål Næverlid Sævik](https://uk.mathworks.com/matlabcentral/fileexchange/38716-curly-brace-annotation) for MATLAB (can be found on File Exchange). Some modifications are done for Python purposes. Some addition features have been implemented, e.g., allow text annotation, negative log (for 'symlog' scale in matplotlib).
 
-This project is built with Python 3.7.1, matplolib 2.2.3 and numpy 1.15.4.
-
-Tested on Windows 7.
-
 **The full documentation is in 'docs/build/html/index.html'**
 
 The following is an example of plotting two curly brackets to annotate a sine wave.
@@ -29,7 +17,7 @@ The following is an example of plotting two curly brackets to annotate a sine wa
 
 ## Main features
 
-- Allows intuitive plotting of a curly bracket between two points within the given axes of the given figure 
+- Allows intuitive plotting of a curly bracket between two points within the given axes of the given figure
 - Allows text annotation to be placed at the summit of the bracket with the same rotation as the bracket
 - The height of the bracket can be controlled
 - Accepts line settings for the bracket lines (same as matplotlib via named parameters, e.g., line width, line colour, etc.)
@@ -37,23 +25,20 @@ The following is an example of plotting two curly brackets to annotate a sine wa
 - Works with linear axes and log axes
 - Transformation between axes coordinates and screen coordinates can be turned on or off
 
-## Prerequisites
+## Install
 
-- Python 3.5+
-- matplotlib
-- numpy
+```
+pip install git+https://github.com/jimimatt/matplotlib-curly-brace
+```
 
-## Version
-
-1.0.1
 
 ## Example
 
 ### Annotating sine waves
 
 <!-- ![Example](docs/build/html/_sources/img/exp_sin.png =250x200) -->
-<img src="docs/build/html/_sources/img/exp_sin.png" alt="exp_sin" width="400"/>
 
+<img src="docs/build/html/_sources/img/exp_sin.png" alt="exp_sin" width="400"/>
 
 ```python
 import matplotlib.pyplot as plt
@@ -158,7 +143,6 @@ else:
 plt.show()
 ```
 
-
 ### Annotating circles
 
 <!-- ![Example](docs/build/html/_sources/img/exp_circle.png) -->
@@ -186,3 +170,4 @@ plt.show()
 ## Contributing
 
 高斯羽 博士 (Dr. Gao, Siyu)
+

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -10,18 +9,19 @@
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# documentation root, use Path.resolve() to make it absolute, like shown here.
 #
-import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+from pathlib import Path
+
+sys.path.insert(0, str(Path('../').resolve()))
 
 import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
 project = 'curlyBrace'
-copyright = '2019, 高斯羽 博士 (Dr. Gao, Siyu)'
+copyright = '2019, 高斯羽 博士 (Dr. Gao, Siyu)'  # noqa: A001
 author = '高斯羽 博士 (Dr. Gao, Siyu)'
 
 # The short X.Y version
@@ -39,14 +39,9 @@ release = '1.0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon'
-]
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode', 'sphinx.ext.githubpages', 'sphinx.ext.napoleon']
 
-autodoc_mock_imports =['matplotlib', 'numpy']
+autodoc_mock_imports = ['matplotlib', 'numpy']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -118,15 +113,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -136,8 +128,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'curlyBrace.tex', 'curlyBrace Documentation',
-     'Dr. Gao, Siyu', 'manual'),
+    (master_doc, 'curlyBrace.tex', 'curlyBrace Documentation', 'Dr. Gao, Siyu', 'manual'),
 ]
 
 
@@ -145,10 +136,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'curlybrace', 'curlyBrace Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'curlybrace', 'curlyBrace Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -157,9 +145,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'curlyBrace', 'curlyBrace Documentation',
-     author, 'curlyBrace', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        'curlyBrace',
+        'curlyBrace Documentation',
+        author,
+        'curlyBrace',
+        'One line description of project.',
+        'Miscellaneous',
+    ),
 ]
 
 

@@ -1,11 +1,11 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class TestCurlyBrace:
     """Test the curlyBrace function."""
 
-    def test_basic_functionality(self):
+    def test_basic_functionality(self) -> None:
         """Test basic curlyBrace plotting."""
         from curlyBrace import curlyBrace
 
@@ -41,7 +41,7 @@ class TestCurlyBrace:
 
         plt.close(fig)
 
-    def test_with_text_annotation(self):
+    def test_with_text_annotation(self) -> None:
         """Test curlyBrace with text annotation."""
         from curlyBrace import curlyBrace
 
@@ -54,26 +54,20 @@ class TestCurlyBrace:
         p1 = [0.0, 0.0]
         p2 = [np.pi, 0.0]
 
-        result = curlyBrace(
-            fig, ax, p1, p2,
-            k_r=0.1,
-            bool_auto=True,
-            str_text='Test',
-            fontdict={'size': 12}
-        )
+        result = curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='Test', fontdict={'size': 12})
 
         assert len(result) == 6
 
         plt.close(fig)
 
-    def test_auto_scale_off(self):
+    def test_auto_scale_off(self) -> None:
         """Test curlyBrace with auto scale turned off."""
         from curlyBrace import curlyBrace
 
         fig, ax = plt.subplots()
         ax.set_aspect('equal')
 
-        x = np.linspace(0, 2*np.pi, 100)
+        x = np.linspace(0, 2 * np.pi, 100)
         y = np.sin(x)
         ax.plot(x, y)
 

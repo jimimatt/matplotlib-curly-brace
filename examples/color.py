@@ -4,10 +4,11 @@ Author: Markus Reinert
 Last Modified: 2022-03-23
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 from curlyBrace import curlyBrace
-
 
 save_figure = False
 
@@ -21,7 +22,6 @@ for i in range(12):
     curlyBrace(fig, ax, (-1, i), (1, i))
 
 if save_figure:
-    import os
-    fig.savefig(os.path.basename(__file__).replace(".py", ".png"))
+    fig.savefig(Path(__file__).with_suffix(".png"))
 
 plt.show()

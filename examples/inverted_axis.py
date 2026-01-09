@@ -4,10 +4,11 @@ Author: Markus Reinert
 Last Modified: 2022-03-23
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 from curlyBrace import curlyBrace
-
 
 save_figure = False
 
@@ -25,7 +26,6 @@ axs[1].scatter([0, 1], [-0.5, 0.5])
 curlyBrace(fig, axs[1], (1, 0.5), (0, -0.5), str_text="Hello curly brace!", color="black")
 
 if save_figure:
-    import os
-    fig.savefig(os.path.basename(__file__).replace(".py", ".png"))
+    fig.savefig(Path(__file__).with_suffix(".png"))
 
 plt.show()

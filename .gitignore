@@ -1,9 +1,19 @@
-*.pyc
-.vscode/settings.json
-*.db
-# *.png
-# Makefile
-build/
-# make.bat
-# source/_build/html/
+.idea/
+.vscode/
+.claude/
 
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# generated docs
+docs/build/
+docs/source/_build/
+
+# Virtual environments
+.venv/
+venv/

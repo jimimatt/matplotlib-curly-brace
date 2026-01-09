@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*- 
-
 '''
 Module Name : curlyBrace
 
@@ -9,15 +7,15 @@ Version : 1.0.2
 
 Last Modified : 2019-04-22
 
-This module is basically an Python implementation of the function written Pål Næverlid Sævik
+This module is basically a Python implementation of the function written Pål Næverlid Sævik
 for MATLAB (link in Reference).
 
-The function "curlyBrace" allows you to plot an optionally annotated curly bracket between 
+The function "curlyBrace" allows you to plot an optionally annotated curly bracket between
 two points when using matplotlib.
 
 The usual settings for line and fonts in matplotlib also apply.
 
-The function takes the axes scales into account automatically. But when the axes aspect is 
+The function takes the axes scales into account automatically. But when the axes aspect is
 set to "equal", the auto switch should be turned off.
 
 Change Log
@@ -40,10 +38,138 @@ List of functions
 
 '''
 
-import matplotlib.pyplot as plt
-import numpy as np
+from __future__ import annotations
 
-def getAxSize(fig, ax):
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, NamedTuple, cast, overload
+
+import numpy as np
+import numpy.typing as npt
+
+if TYPE_CHECKING:
+    import matplotlib.axes
+    import matplotlib.figure
+
+
+FloatArray = npt.NDArray[np.floating[Any]]
+ScalarFunc = Callable[[float], float]
+ArrayFunc = Callable[[FloatArray], FloatArray]
+
+
+@overload
+def mirroring(vals: float, function: ScalarFunc) -> float: ...
+
+
+@overload
+def mirroring(vals: FloatArray, function: ArrayFunc) -> FloatArray: ...
+
+
+def mirroring(
+    vals: float | FloatArray,
+    function: ScalarFunc | ArrayFunc,
+) -> float | FloatArray:
+    """Apply a function with sign preservation for negative values.
+
+    For positive values: returns function(val)
+    For negative values: returns -function(abs(val))
+    For zero: returns 0.0
+
+    This allows applying log/exp transforms to arrays that may contain negative values
+    by mirroring the transformation across zero.
+    """
+    if isinstance(vals, (float, np.floating)):
+        scalar_func = cast('ScalarFunc', function)
+        scalar_val = float(vals)
+        if scalar_val > 0.0:
+            return scalar_func(scalar_val)
+        if scalar_val < 0.0:
+            return -scalar_func(abs(scalar_val))
+        return 0.0
+
+    array_vals = cast('FloatArray', vals)
+    array_func = cast('ArrayFunc', function)
+
+    result = np.zeros_like(array_vals, dtype=float)
+
+    pos_mask = array_vals > 0.0
+    neg_mask = array_vals < 0.0
+
+    if np.any(pos_mask):
+        result[pos_mask] = array_func(array_vals[pos_mask])
+    if np.any(neg_mask):
+        result[neg_mask] = -array_func(np.abs(array_vals[neg_mask]))
+    return result
+
+
+def add_bracket_annotation(
+    ax: matplotlib.axes.Axes,
+    str_text: str,
+    summit_x: float,
+    summit_y: float,
+    theta: float,
+    ax_ylim: list[float],
+    int_line_num: int = 2,
+    fontdict: dict[str, Any] | None = None,
+) -> None:
+    """Add text annotation to the bracket at the summit position.
+
+    Parameters
+    ----------
+    ax : matplotlib axes object
+        The target axes.
+    str_text : str
+        The annotation text to display.
+    summit_x : float
+        X-coordinate of the bracket summit (annotation position).
+    summit_y : float
+        Y-coordinate of the bracket summit (annotation position).
+    theta : float
+        The bracket angle in radians.
+    ax_ylim : list[float]
+        The y-axis limits to determine axis orientation.
+    int_line_num : int
+        Number of lines spacing between bracket and text.
+    fontdict : dict[str, Any] | None
+        Font dictionary for text styling.
+    """
+    if fontdict is None:
+        fontdict = {}
+
+    int_line_num = int(int_line_num)
+    str_temp = '\n' * int_line_num
+
+    # Convert radians to degree and within 0 to 360
+    ang = np.degrees(theta) % 360.0
+
+    # Determine rotation and text position based on angle and axis orientation
+    if 0.0 <= ang <= 90.0:
+        if ax_ylim[0] < ax_ylim[1]:
+            rotation = ang
+            str_text = str_text + str_temp
+        else:
+            rotation = -ang
+            str_text = str_temp + str_text
+    elif 90.0 < ang < 270.0:
+        if ax_ylim[0] < ax_ylim[1]:
+            rotation = ang + 180.0
+            str_text = str_temp + str_text
+        else:
+            rotation = -(ang + 180.0)
+            str_text = str_text + str_temp
+    elif 270.0 <= ang <= 360.0:
+        if ax_ylim[0] < ax_ylim[1]:
+            rotation = ang
+            str_text = str_text + str_temp
+        else:
+            rotation = -ang
+            str_text = str_temp + str_text
+    else:
+        rotation = ang if ax_ylim[0] < ax_ylim[1] else -ang
+
+    ax.text(summit_x, summit_y, str_text, ha='center', va='center', rotation=rotation, fontdict=fontdict)
+
+
+def getAxSize(fig: matplotlib.figure.Figure, ax: matplotlib.axes.Axes) -> tuple[float, float]:
     '''
     .. _getAxSize :
 
@@ -77,8 +203,29 @@ def getAxSize(fig, ax):
 
     return ax_width, ax_height
 
-def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_num=2, fontdict={}, **kwargs):
-# def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_num=2, fontdict={}, **kwargs):
+
+class CurlyBraceResult(NamedTuple):
+    theta: float
+    summit: list[float]
+    arc1: list[float]
+    arc2: list[float]
+    arc3: list[float]
+    arc4: list[float]
+
+
+def curlyBrace(
+    fig: matplotlib.figure.Figure,
+    ax: matplotlib.axes.Axes,
+    p1: list[float] | tuple[float, float],
+    p2: list[float] | tuple[float, float],
+    k_r: float = 0.1,
+    bool_auto: bool = True,
+    str_text: str = '',
+    int_line_num: int = 2,
+    fontdict: dict[str, Any] | None = None,
+    **kwargs,  # noqa: ANN003
+) -> CurlyBraceResult:
+    # def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_num=2, fontdict={}, **kwargs):
     '''
     .. _curlyBrace :
 
@@ -88,7 +235,7 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
     "p1" and "p2".
 
     Note that, when the axes aspect is not set to "equal", the axes coordinates need to be
-    transformed to screen coordinates, otherwise the arcs may not be seeable. 
+    transformed to screen coordinates, otherwise the arcs may not be seeable.
 
     Parameters
     ----------
@@ -127,7 +274,7 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
         The annotation text of the bracket. It would displayed at the mid point
         of bracket with the same rotation as the bracket.
 
-        By default, it follows the anti-clockwise convention. To flip it, swap 
+        By default, it follows the anti-clockwise convention. To flip it, swap
         the end point and the starting point.
 
         The appearance of this string can be set by using "fontdict", which follows
@@ -178,9 +325,11 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
     ----------
     https://uk.mathworks.com/matlabcentral/fileexchange/38716-curly-brace-annotation
     '''
+    if fontdict is None:
+        fontdict = {}
 
-    pt1 = [None, None]
-    pt2 = [None, None]
+    pt1: list[float | None] = [None, None]
+    pt2: list[float | None] = [None, None]
 
     ax_width, ax_height = getAxSize(fig, ax)
 
@@ -189,92 +338,18 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
 
     # log scale consideration
     if 'log' in ax.get_xaxis().get_scale():
-
-        if p1[0] > 0.0:
-
-            pt1[0] = np.log(p1[0])
-
-        elif p1[0] < 0.0:
-
-            pt1[0] = -np.log(abs(p1[0]))
-
-        else:
-
-            pt1[0] = 0.0
-
-        if p2[0] > 0.0:
-
-            pt2[0] = np.log(p2[0])
-
-        elif p2[0] < 0.0:
-
-            pt2[0] = -np.log(abs(p2[0]))
-
-        else:
-
-            pt2[0] = 0
-
-        for i in range(0, len(ax_xlim)):
-
-            if ax_xlim[i] > 0.0:
-
-                ax_xlim[i] = np.log(ax_xlim[i])
-
-            elif ax_xlim[i] < 0.0:
-
-                ax_xlim[i] = -np.log(abs(ax_xlim[i]))
-
-            else:
-
-                ax_xlim[i] = 0.0
-
+        pt1[0] = mirroring(p1[0], np.log)
+        pt2[0] = mirroring(p2[0], np.log)
+        ax_xlim = mirroring(np.array(ax_xlim), np.log).tolist()
     else:
-
         pt1[0] = p1[0]
         pt2[0] = p2[0]
 
     if 'log' in ax.get_yaxis().get_scale():
-
-        if p1[1] > 0.0:
-
-            pt1[1] = np.log(p1[1])
-
-        elif p1[1] < 0.0:
-
-            pt1[1] = -np.log(abs(p1[1]))
-
-        else:
-
-            pt1[1] = 0.0
-
-        if p2[1] > 0.0:
-
-            pt2[1] = np.log(p2[1])
-
-        elif p2[1] < 0.0:
-
-            pt2[1] = -np.log(abs(p2[1]))
-
-        else:
-
-            pt2[1] = 0.0
-
-        for i in range(0, len(ax_ylim)):
-
-            if ax_ylim[i] > 0.0:
-
-                ax_ylim[i] = np.log(ax_ylim[i])
-
-            elif ax_ylim[i] < 0.0:
-
-                ax_ylim[i] = -np.log(abs(ax_ylim[i]))
-
-            else:
-
-                ax_ylim[i] = 0.0
-
+        pt1[1] = mirroring(p1[1], np.log)
+        pt2[1] = mirroring(p2[1], np.log)
+        ax_ylim = mirroring(np.array(ax_ylim), np.log).tolist()
     else:
-
         pt1[1] = p1[1]
         pt2[1] = p2[1]
 
@@ -283,16 +358,11 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
     yscale = ax_height / abs(ax_ylim[1] - ax_ylim[0])
 
     # this is to deal with 'equal' axes aspects
-    if bool_auto:
-
-        pass
-
-    else:
-
+    if not bool_auto:
         xscale = 1.0
         yscale = 1.0
 
-    # convert length to pixels, 
+    # convert length to pixels,
     # need to minus the lower limit to move the points back to the origin. Then add the limits back on end.
     pt1[0] = (pt1[0] - ax_xlim[0]) * xscale
     pt1[1] = (pt1[1] - ax_ylim[0]) * yscale
@@ -310,30 +380,29 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
     y11 = pt1[1] + r * np.sin(theta)
 
     # arc2 centre
-    x22 = (pt2[0] + pt1[0]) / 2.0 - 2.0 * r * np.sin(theta) - r * np.cos(theta)
-    y22 = (pt2[1] + pt1[1]) / 2.0 + 2.0 * r * np.cos(theta) - r * np.sin(theta)
+    x22 = (pt2[0] + pt1[0]) * 0.5 - 2.0 * r * np.sin(theta) - r * np.cos(theta)
+    y22 = (pt2[1] + pt1[1]) * 0.5 + 2.0 * r * np.cos(theta) - r * np.sin(theta)
 
     # arc3 centre
-    x33 = (pt2[0] + pt1[0]) / 2.0 - 2.0 * r * np.sin(theta) + r * np.cos(theta)
-    y33 = (pt2[1] + pt1[1]) / 2.0 + 2.0 * r * np.cos(theta) + r * np.sin(theta)
+    x33 = (pt2[0] + pt1[0]) * 0.5 - 2.0 * r * np.sin(theta) + r * np.cos(theta)
+    y33 = (pt2[1] + pt1[1]) * 0.5 + 2.0 * r * np.cos(theta) + r * np.sin(theta)
 
     # arc4 centre
     x44 = pt2[0] - r * np.cos(theta)
     y44 = pt2[1] - r * np.sin(theta)
 
     # prepare the rotated
-    q = np.linspace(theta, theta + np.pi/2.0, 50)
+    q = np.linspace(theta, theta + 0.5 * np.pi, 50)
 
     # reverse q
-    # t = np.flip(q) # this command is not supported by lower version of numpy
-    t = q[::-1]
+    t = np.flip(q)
 
     # arc coordinates
-    arc1x = r * np.cos(t + np.pi/2.0) + x11
-    arc1y = r * np.sin(t + np.pi/2.0) + y11
+    arc1x = r * np.cos(t + 0.5 * np.pi) + x11
+    arc1y = r * np.sin(t + 0.5 * np.pi) + y11
 
-    arc2x = r * np.cos(q - np.pi/2.0) + x22
-    arc2y = r * np.sin(q - np.pi/2.0) + y22
+    arc2x = r * np.cos(q - 0.5 * np.pi) + x22
+    arc2y = r * np.sin(q - 0.5 * np.pi) + y22
 
     arc3x = r * np.cos(q + np.pi) + x33
     arc3y = r * np.sin(q + np.pi) + y33
@@ -352,196 +421,40 @@ def curlyBrace(fig, ax, p1, p2, k_r=0.1, bool_auto=True, str_text='', int_line_n
     arc3y = arc3y / yscale + ax_ylim[0]
     arc4y = arc4y / yscale + ax_ylim[0]
 
-    # log scale consideration
+    # log scale consideration - convert back from log space
     if 'log' in ax.get_xaxis().get_scale():
-
-        for i in range(0, len(arc1x)):
-
-            if arc1x[i] > 0.0:
-
-                arc1x[i] = np.exp(arc1x[i])
-
-            elif arc1x[i] < 0.0:
-
-                arc1x[i] = -np.exp(abs(arc1x[i]))
-
-            else:
-
-                arc1x[i] = 0.0
-
-        for i in range(0, len(arc2x)):
-
-            if arc2x[i] > 0.0:
-
-                arc2x[i] = np.exp(arc2x[i])
-
-            elif arc2x[i] < 0.0:
-
-                arc2x[i] = -np.exp(abs(arc2x[i]))
-
-            else:
-
-                arc2x[i] = 0.0
-
-        for i in range(0, len(arc3x)):
-
-            if arc3x[i] > 0.0:
-
-                arc3x[i] = np.exp(arc3x[i])
-
-            elif arc3x[i] < 0.0:
-
-                arc3x[i] = -np.exp(abs(arc3x[i]))
-
-            else:
-
-                arc3x[i] = 0.0
-
-        for i in range(0, len(arc4x)):
-
-            if arc4x[i] > 0.0:
-
-                arc4x[i] = np.exp(arc4x[i])
-
-            elif arc4x[i] < 0.0:
-
-                arc4x[i] = -np.exp(abs(arc4x[i]))
-
-            else:
-
-                arc4x[i] = 0.0
-
-    else:
-
-        pass
+        arc1x = mirroring(arc1x, np.exp)
+        arc2x = mirroring(arc2x, np.exp)
+        arc3x = mirroring(arc3x, np.exp)
+        arc4x = mirroring(arc4x, np.exp)
 
     if 'log' in ax.get_yaxis().get_scale():
+        arc1y = mirroring(arc1y, np.exp)
+        arc2y = mirroring(arc2y, np.exp)
+        arc3y = mirroring(arc3y, np.exp)
+        arc4y = mirroring(arc4y, np.exp)
 
-        for i in range(0, len(arc1y)):
+    # plot arcs - plot first arc and extract its color to ensure all parts match
+    (first_arc_line,) = ax.plot(arc1x, arc1y, **kwargs)
+    bracket_color = first_arc_line.get_color()
+    kwargs["color"] = bracket_color
 
-            if arc1y[i] > 0.0:
-
-                arc1y[i] = np.exp(arc1y[i])
-
-            elif arc1y[i] < 0.0:
-
-                arc1y[i] = -np.exp(abs(arc1y[i]))
-
-            else:
-
-                arc1y[i] = 0.0
-
-        for i in range(0, len(arc2y)):
-
-            if arc2y[i] > 0.0:
-
-                arc2y[i] = np.exp(arc2y[i])
-
-            elif arc2y[i] < 0.0:
-
-                arc2y[i] = -np.exp(abs(arc2y[i]))
-
-            else:
-
-                arc2y[i] = 0.0
-
-        for i in range(0, len(arc3y)):
-
-            if arc3y[i] > 0.0:
-
-                arc3y[i] = np.exp(arc3y[i])
-
-            elif arc3y[i] < 0.0:
-
-                arc3y[i] = -np.exp(abs(arc3y[i]))
-
-            else:
-
-                arc3y[i] = 0.0
-
-        for i in range(0, len(arc4y)):
-
-            if arc4y[i] > 0.0:
-
-                arc4y[i] = np.exp(arc4y[i])
-
-            elif arc4y[i] < 0.0:
-
-                arc4y[i] = -np.exp(abs(arc4y[i]))
-
-            else:
-
-                arc4y[i] = 0.0
-
-    else:
-
-        pass
-
-    # plot arcs
-    l, = ax.plot(arc1x, arc1y, **kwargs)
-    kwargs["color"] = l.get_color()
     ax.plot(arc2x, arc2y, **kwargs)
     ax.plot(arc3x, arc3y, **kwargs)
     ax.plot(arc4x, arc4y, **kwargs)
 
-    # plot lines
+    # plot connecting lines between arcs
     ax.plot([arc1x[-1], arc2x[1]], [arc1y[-1], arc2y[1]], **kwargs)
     ax.plot([arc3x[-1], arc4x[1]], [arc3y[-1], arc4y[1]], **kwargs)
 
     summit = [arc2x[-1], arc2y[-1]]
 
     if str_text:
-
-        int_line_num = int(int_line_num)
-
-        str_temp = '\n' * int_line_num
-        
-        # convert radians to degree and within 0 to 360
-        ang = np.degrees(theta) % 360.0
-
-        if (ang >= 0.0) and (ang <= 90.0):
-
-            if ax_ylim[0] < ax_ylim[1]:
-                rotation = ang
-                str_text = str_text + str_temp
-            else:
-                rotation = -ang
-                str_text = str_temp + str_text
-
-        if (ang > 90.0) and (ang < 270.0):
-
-            if ax_ylim[0] < ax_ylim[1]:
-                rotation = ang + 180.0
-                str_text = str_temp + str_text
-            else:
-                rotation = -(ang + 180.0)
-                str_text = str_text + str_temp
-
-        elif (ang >= 270.0) and (ang <= 360.0):
-
-            if ax_ylim[0] < ax_ylim[1]:
-                rotation = ang
-                str_text = str_text + str_temp
-            else:
-                rotation = -ang
-                str_text = str_temp + str_text
-
-        else:
-
-            if ax_ylim[0] < ax_ylim[1]:
-                rotation = ang
-            else:
-                rotation = -ang
-
-        ax.axes.text(arc2x[-1], arc2y[-1], str_text, ha='center', va='center', rotation=rotation, fontdict=fontdict)
-
-    else:
-
-        pass
+        add_bracket_annotation(ax, str_text, arc2x[-1], arc2y[-1], theta, ax_ylim, int_line_num, fontdict)
 
     arc1 = [arc1x, arc1y]
     arc2 = [arc2x, arc2y]
     arc3 = [arc3x, arc3y]
     arc4 = [arc4x, arc4y]
 
-    return theta, summit, arc1, arc2, arc3, arc4
+    return CurlyBraceResult(theta, summit, arc1, arc2, arc3, arc4)

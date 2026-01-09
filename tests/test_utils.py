@@ -1,19 +1,20 @@
 """Tests for utility functions."""
 
-import pytest
 import matplotlib.pyplot as plt
+
 from curlyBrace import getAxSize
 
 
 class TestGetAxSize:
     """Test the getAxSize utility function."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """Test that getAxSize can be imported."""
         from curlyBrace import getAxSize
+
         assert callable(getAxSize)
 
-    def test_basic_functionality(self):
+    def test_basic_functionality(self) -> None:
         """Test basic getAxSize functionality."""
         fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -27,7 +28,7 @@ class TestGetAxSize:
 
         plt.close(fig)
 
-    def test_different_figure_sizes(self):
+    def test_different_figure_sizes(self) -> None:
         """Test getAxSize with different figure sizes."""
         # Small figure
         fig_small, ax_small = plt.subplots(figsize=(4, 3))
@@ -44,7 +45,7 @@ class TestGetAxSize:
         plt.close(fig_small)
         plt.close(fig_large)
 
-    def test_aspect_ratio(self):
+    def test_aspect_ratio(self) -> None:
         """Test getAxSize maintains expected aspect ratios."""
         # Wide figure
         fig_wide, ax_wide = plt.subplots(figsize=(10, 5))

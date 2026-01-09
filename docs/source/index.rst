@@ -13,10 +13,6 @@ the axes and plot a curly bracket with text annotation at the summit of the brac
 
 The implementation here is based largely on the implementation by `Pål Næverlid Sævik <https://uk.mathworks.com/matlabcentral/fileexchange/38716-curly-brace-annotation>`_ for MATLAB (can be found on File Exchange). Some modifications are done for Python purposes. Some addition features have been implemented, e.g., allow text annotation, negative log (for 'symlog' scale in matplotlib).
 
-This project is built with Python 3.7.1, matplolib 2.2.3 and numpy 1.15.4.
-
-Tested on Windows 7.
-
 The following is an example of plotting two curly brackets to annotate a sine wave.
 
 .. figure:: ../build/html/_sources/img/exp.jpg
